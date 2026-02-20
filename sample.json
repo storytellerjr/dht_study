@@ -1,0 +1,19 @@
+{
+  "name": "DHT Test Data",
+  "version": "1.0",
+  "description": "Sample JSON file for testing DHT storage and retrieval",
+  "data": {
+    "numbers": [1, 2, 3, 4, 5],
+    "colors": ["red", "green", "blue"],
+    "metadata": {
+      "created": "2026-02-20",
+      "author": "DHT Study Project",
+      "tags": ["test", "json", "dht", "storage"]
+    }
+  },
+  "config": {
+    "enabled": true,
+    "maxRetries": 3,
+    "timeout": 5000
+  }
+}
