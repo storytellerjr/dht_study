@@ -25,6 +25,7 @@ This project documents a complete learning journey from DHT fundamentals to prod
 | **5** | Storage Architecture | Request handlers, data persistence, command protocols |
 | **6** | Advanced Features | Warehouse nodes, metadata tracking, analytics |
 | **7** | Production Scale | 63-node networks, JSON storage pipeline, multi-node replication |
+| **8** | **Enterprise Storage** ⭐ | **Production warehouse system, CRUD operations, comprehensive testing** |
 
 ---
 
@@ -46,6 +47,7 @@ This project documents a complete learning journey from DHT fundamentals to prod
 - **`sample.json`** - Test data for storage experiments
 
 ### **🔬 Testing & Experimentation**
+- **`test_warehouse.mjs`** - **NEW!** Comprehensive 7-test validation suite for warehouse storage
 - **`working_demo.mjs`** - Functional DHT demonstration
 - **`simple_demo.mjs`** - Basic DHT operations
 - **`small_network.mjs`** - Controlled network testing
@@ -84,11 +86,139 @@ node retrieve_json.mjs fe55bb60efb0b18d59e644a55263b4be25d8c5217dfd55a7d18eb37f5
 node retrieve_json.mjs <hash> retrieved_data.json
 ```
 
-### **4. Advanced Storage**
+### **4. Advanced Warehouse Storage** ⭐ **NEW!**
 ```bash
-# Run enterprise warehouse node
-node warehouse_node.mjs
-# Provides: metadata tracking, inventory management, access analytics
+# Start multiple warehouse nodes for distributed storage
+node warehouse_node.mjs  # Warehouse 1
+node warehouse_node.mjs  # Warehouse 2 (different terminal)
+node warehouse_node.mjs  # Warehouse 3 (different terminal)
+
+# Test the complete warehouse system
+node test_warehouse.mjs
+# Runs 7 comprehensive tests:
+# ✅ Storage operations with metadata
+# ✅ Retrieval with integrity validation
+# ✅ Inventory listing and management
+# ✅ Access tracking and analytics
+# ✅ Deletion and lifecycle management
+# ✅ Error handling and edge cases
+# ✅ Multi-node compatibility
+```
+
+---
+
+## 🏭 **NEW: Advanced Warehouse Storage System** ⭐
+
+### **Major Improvements & Features**
+
+The warehouse system has been completely overhauled with enterprise-grade features for production distributed storage networks.
+
+#### **🔧 Core Enhancements**
+- **Fixed DHT Protocol Handling**: Proper token management and request/response cycles
+- **Advanced Metadata Tracking**: Access counts, timestamps, storage sizes, source tracking
+- **Complete CRUD Operations**: Store, Retrieve, List, Delete with full lifecycle management
+- **Production-Ready Logging**: Comprehensive operation tracking and debugging
+- **Multi-Node Compatibility**: Seamless operation across distributed warehouse networks
+
+#### **📊 New Commands & Capabilities**
+
+| Command | Code | Purpose | Features |
+|---------|------|---------|----------|
+| **STORE** | 100 | Store data with metadata | Size tracking, source attribution, timestamp |
+| **GET** | 101 | Retrieve with access tracking | Increments access count, logs retrieval |
+| **LIST** | 102 | Inventory management | Complete metadata listing, JSON export |
+| **DELETE** | 103 | Lifecycle management | Secure deletion with confirmation |
+
+#### **🧪 Comprehensive Testing Suite**
+
+The `test_warehouse.mjs` provides complete validation:
+
+```bash
+🧪 WAREHOUSE STORAGE TEST RESULTS
+==================================================
+✅ Passed: 7/7 - ALL TESTS PASSED!
+🎉 Warehouse storage is working correctly!
+
+Tests Cover:
+1. Storage Operations - Multi-format data storage
+2. Retrieval Integrity - Data consistency validation  
+3. Inventory Management - Metadata listing and tracking
+4. Access Analytics - Usage pattern monitoring
+5. Deletion Lifecycle - Secure data removal
+6. Error Handling - Edge case resilience
+7. Multi-Node Support - Distributed network compatibility
+```
+
+#### **🌐 Multi-Warehouse Network Benefits**
+
+**Fault Tolerance**: Data survives individual node failures
+```bash
+# Run multiple warehouses for redundancy
+node warehouse_node.mjs  # Port auto-assigned
+node warehouse_node.mjs  # Port auto-assigned  
+node warehouse_node.mjs  # Port auto-assigned
+# Data automatically distributed across all nodes
+```
+
+**Load Distribution**: Requests balanced across network
+```javascript
+// Clients automatically find optimal warehouse
+const warehouses = await findAvailableWarehouses()
+// DHT routes to nearest/fastest warehouse automatically
+```
+
+**Geographic Scaling**: Deploy warehouses globally
+```bash
+# Different geographic locations
+Server-US:     node warehouse_node.mjs --location="us-east"
+Server-Europe: node warehouse_node.mjs --location="eu-west"  
+Server-Asia:   node warehouse_node.mjs --location="ap-south"
+# Users connect to nearest warehouse automatically
+```
+
+#### **📈 Real-World Applications**
+
+- **Enterprise Storage**: Replace centralized databases with distributed warehouses
+- **Content Distribution**: Media files replicated across geographic locations
+- **IoT Data Collection**: Sensor data stored in regional warehouse clusters
+- **Microservices Storage**: Each service gets its own warehouse network
+- **Web3 Applications**: Decentralized storage without central authorities
+
+#### **🚀 Usage Examples**
+
+**Store Any Data Type**:
+```javascript
+// JSON data
+await store('user-config', JSON.stringify({theme: 'dark', lang: 'en'}))
+
+// Binary files  
+const fileBuffer = fs.readFileSync('document.pdf')
+await store('document-123', fileBuffer)
+
+// Plain text
+await store('session-data', 'user-session-abc123')
+```
+
+**Advanced Queries**:
+```javascript
+// Get complete inventory with metadata
+const inventory = await listWarehouseInventory()
+console.log(inventory) 
+// Shows: keys, sizes, access counts, timestamps
+
+// Track data usage
+const stats = await getAccessStatistics('user-data-key')
+console.log(`Accessed ${stats.count} times, last: ${stats.lastAccess}`)
+```
+
+**Multi-Node Replication**:
+```javascript
+// Store in multiple warehouses for redundancy
+const warehouses = await findWarehouseNodes()
+for (const warehouse of warehouses.slice(0, 3)) {
+  await storeInWarehouse(warehouse, criticalData)
+}
+// Data now exists in 3 different locations
 ```
 
 ---
@@ -125,11 +255,13 @@ node warehouse_node.mjs
 - Global content discovery by hash
 - Data integrity verification
 
-### **✅ Enterprise Storage Features**
-- Metadata tracking (timestamp, size, access count)
-- Inventory management and CRUD operations  
-- Performance analytics and monitoring
-- Audit trails and access logging
+### **✅ Enterprise Storage Features** ⭐ **ENHANCED!**
+- **Advanced Metadata Tracking**: Timestamps, sizes, access counts, source attribution
+- **Complete CRUD Operations**: Store, GET, LIST, DELETE with lifecycle management
+- **Real-time Analytics**: Usage patterns, performance monitoring, access statistics
+- **Comprehensive Logging**: Operation audit trails and debug information
+- **Multi-Node Orchestration**: Automatic distribution and load balancing
+- **Production Testing**: 7-test validation suite ensuring reliability
 
 ---
 
