@@ -169,6 +169,7 @@ This study project is built upon the excellent **dht-rpc** library:
 - **JSON pipeline**: Complete content storage and retrieval system
 
 ### **Study Project Attribution**
+- **Created by**: storyteller
 - **Learning Documentation**: Original educational content and analysis
 - **Example Scripts**: Custom implementations for learning objectives
 - **Architecture Patterns**: Original warehouse and enterprise storage designs
