@@ -35,31 +35,39 @@ node.on('request', (req) => {
     target: req.target?.toString('hex').substring(0, 8) + '...'
   })
 
-  if (req.command === STORE_COMMAND && req.token) {
-    // STORE with metadata tracking
-    const key = req.target.toString('hex')
-    const value = req.value
-    
-    warehouse.set(key, value)
-    metadata.set(key, {
-      storedAt: Date.now(),
-      storedBy: `${req.from.host}:${req.from.port}`,
-      size: value.length,
-      accessCount: 0
-    })
-    
-    storageStats.totalStored++
-    
-    console.log(`🏭 WAREHOUSE STORED:`)
-    console.log(`   Key: ${key.substring(0, 16)}...`)
-    console.log(`   Value: "${value.toString()}"`)
-    console.log(`   Size: ${value.length} bytes`)
-    console.log(`   Total items: ${warehouse.size}`)
-    
-    req.reply(Buffer.from(`stored-in-warehouse-${node.address().port}`))
-    
-  } else if (req.command === GET_COMMAND) {
-    // GET with access tracking
+  // STORE command handling
+  if (req.command === STORE_COMMAND) {
+    if (req.token) {
+      // Actually store the data
+      const key = req.target.toString('hex')
+      const value = req.value
+      
+      warehouse.set(key, value)
+      metadata.set(key, {
+        storedAt: Date.now(),
+        storedBy: `${req.from.host}:${req.from.port}`,
+        size: value.length,
+        accessCount: 0
+      })
+      
+      storageStats.totalStored++
+      
+      console.log(`🏭 WAREHOUSE STORED:`)
+      console.log(`   Key: ${key.substring(0, 16)}...`)
+      console.log(`   Value: "${value.toString()}"`)
+      console.log(`   Size: ${value.length} bytes`)
+      console.log(`   Total items: ${warehouse.size}`)
+      
+      req.reply(null) // Standard DHT response for successful storage
+      return
+    } else {
+      // Query phase - let DHT handle token provision automatically
+      console.log(`🔍 WAREHOUSE: Query phase for storage`)
+    }
+  }
+  
+  // GET command handling
+  if (req.command === GET_COMMAND) {
     const key = req.target.toString('hex')
     const value = warehouse.get(key)
     
@@ -76,16 +84,21 @@ node.on('request', (req) => {
       console.log(`🚚 WAREHOUSE SERVED:`)
       console.log(`   Key: ${key.substring(0, 16)}...`)
       console.log(`   Value: "${value.toString()}"`)
+      console.log(`   Value type: ${typeof value}`)
+      console.log(`   Value constructor: ${value.constructor.name}`)
       console.log(`   Access count: ${meta?.accessCount || 0}`)
       
       req.reply(value)
+      return
     } else {
       console.log(`❌ WAREHOUSE: Key not found: ${key.substring(0, 16)}...`)
       req.reply(null)
+      return
     }
-    
-  } else if (req.command === LIST_COMMAND) {
-    // NEW: List all stored items
+  }
+  
+  // LIST command handling
+  if (req.command === LIST_COMMAND) {
     console.log(`📋 WAREHOUSE INVENTORY REQUEST`)
     
     const inventory = Array.from(warehouse.entries()).map(([key, value]) => {
@@ -99,33 +112,48 @@ node.on('request', (req) => {
       }
     })
     
+    const inventoryJson = JSON.stringify(inventory)
     console.log(`   Sending inventory of ${inventory.length} items`)
-    req.reply(Buffer.from(JSON.stringify(inventory)))
+    console.log(`   Inventory JSON: ${inventoryJson.substring(0, 100)}...`)
+    console.log(`   Inventory buffer length: ${Buffer.from(inventoryJson).length}`)
     
-  } else if (req.command === DELETE_COMMAND && req.token) {
-    // NEW: Delete stored items
-    const key = req.target.toString('hex')
-    
-    if (warehouse.has(key)) {
-      const value = warehouse.get(key)
-      warehouse.delete(key)
-      metadata.delete(key)
-      storageStats.totalDeleted++
-      
-      console.log(`🗑️  WAREHOUSE DELETED:`)
-      console.log(`   Key: ${key.substring(0, 16)}...`)
-      console.log(`   Was: "${value.toString()}"`)
-      
-      req.reply(Buffer.from('deleted'))
-    } else {
-      console.log(`❌ WAREHOUSE: Cannot delete, key not found: ${key.substring(0, 16)}...`)
-      req.reply(Buffer.from('not-found'))
-    }
-    
-  } else {
-    console.log(`❓ Unknown command: ${req.command}`)
-    req.error(1)
+    req.reply(Buffer.from(inventoryJson))
+    return
   }
+  
+  // DELETE command handling
+  if (req.command === DELETE_COMMAND) {
+    if (req.token) {
+      // Actually delete the data
+      const key = req.target.toString('hex')
+      
+      if (warehouse.has(key)) {
+        const value = warehouse.get(key)
+        warehouse.delete(key)
+        metadata.delete(key)
+        storageStats.totalDeleted++
+        
+        console.log(`🗑️  WAREHOUSE DELETED:`)
+        console.log(`   Key: ${key.substring(0, 16)}...`)
+        console.log(`   Was: "${value.toString()}"`)
+        console.log(`   Replying with: "deleted"`)
+        
+        req.reply(Buffer.from('deleted'))
+        return
+      } else {
+        console.log(`❌ WAREHOUSE: Cannot delete, key not found: ${key.substring(0, 16)}...`)
+        req.reply(Buffer.from('not-found'))
+        return
+      }
+    } else {
+      // Query phase - let DHT handle token provision automatically
+      console.log(`🔍 WAREHOUSE: Query phase for deletion`)
+    }
+  }
+  
+  // Default fallback - treat as GET request (standard DHT behavior)
+  const value = warehouse.get(req.target.toString('hex'))
+  req.reply(value)
 })
 
 node.on('ready', () => {
